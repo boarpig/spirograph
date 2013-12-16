@@ -12,12 +12,12 @@ class line(object):
         self.rotation = 0
 
     def step(self):
-        self.rotation += direction * speed
+        self.rotation += self.direction * self.speed
 
     def delta(self):
         rads = pi * self.rotation / 360
-        x = length * cos(rads)
-        y = length * sin(rads)
+        x = self.length * cos(rads)
+        y = self.length * sin(rads)
         return x, y
 
 spiro = []
@@ -30,19 +30,20 @@ for i in spiro:
     spirolen += i.length
 
 size = spirolen * 2 + 20
-center = spirolen + 10, spirolen + 10
+center = [spirolen + 10, spirolen + 10]
 
 im = Image.new("RGB", (size, size))
 draw = ImageDraw.Draw(im)
-prev = center + spirolen
-for i in range(1000):
+prev = center
+prev[0] += spirolen
+for i in range(100000):
     new = center
     for part in spiro:
         part.step()
         delta = part.delta()
         new[0] += delta[0]
         new[1] += delta[1]
-    draw.line(prev, new, fill=128)
+    draw.line((tuple(prev), tuple(new)), fill=128)
     prev = new[:]
 del draw
 im.save("output.png")
