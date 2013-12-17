@@ -3,10 +3,10 @@
 from math import sin, cos, pi
 from PIL import Image, ImageDraw
 
-class line(object):
+class gear(object):
 
-    def __init__(self, length=1, speed=1):
-        self.length = length
+    def __init__(self, radius=1, speed=1):
+        self.radius = radius
         self.speed = speed
         self.rotation = 0
 
@@ -15,36 +15,45 @@ class line(object):
 
     def get_vector(self):
         rads = pi * self.rotation / 360
-        x = self.length * cos(rads)
-        y = self.length * sin(rads)
+        x = self.radius * cos(rads)
+        y = self.radius * sin(rads)
         return x, y
 
-spiro = []
-spiro.append(line(length=100, speed=7))
-spiro.append(line(length=40, speed=17))
 
-spirolen = 0
-for i in spiro:
-    spirolen += i.length
+class Spirograph(object):
 
-size = spirolen * 2 + 20
-center = [spirolen + 10, spirolen + 10]
+    def __init__(self):
+        self.spiro = []
+        self.size = 0
 
-im = Image.new("RGB", (size, size))
-draw = ImageDraw.Draw(im)
-prev = center[:]
-prev[0] += spirolen
-for i in range(10000):
-    new = center[:]
-    for part in spiro:
-        part.step()
-        vector = part.get_vector()
-        new[0] += vector[0]
-        new[1] += vector[1]
-    draw.line((tuple(prev), tuple(new)), fill=128)
-    prev = new[:]
-del draw
-im.save("output.png")
+    def add_gear(self, gear):
+        self.spiro.append(gear)
+        self.size += gear.radius
+
+    def run(self):
+        img_size = self.size * 2 + 20
+        img_center = [self.size + 10, self.size + 10]
+        img = Image.new("RGB", (img_size, img_size))
+        draw = ImageDraw.Draw(img)
+        prev = img_center[:]
+        prev[0] += self.size
+        for i in range(10000):
+            new = img_center[:]
+            for part in self.spiro:
+                part.step()
+                vector = part.get_vector()
+                new[0] += vector[0]
+                new[1] += vector[1]
+            draw.line((tuple(prev), tuple(new)), fill=128)
+            prev = new[:]
+        del draw
+        img.save("output.png")
+
+
+spiro = Spirograph()
+spiro.add_gear(gear(radius=160, speed=7))
+spiro.add_gear(gear(radius=160, speed=17))
+spiro.run()
     
 
 
